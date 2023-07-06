@@ -129,48 +129,64 @@ class Previous extends Component {
   // };
   downloadCSV = async (month) => {
     const { data } = this.state;
-
-    // Filter the data for the specified month
+  
     const monthData = data.filter((item) => {
       const itemMonth = new Date(item.earliestStart).toLocaleString("default", {
         month: "long",
       });
       return itemMonth.toLowerCase() === month.toLowerCase();
     });
-
-    // If there's no data for the month, return early
+  
     if (monthData.length === 0) return;
-
+  
     try {
-      // Fetch the names from the API
       const response = await axios.get("http://localhost:2000/get-school");
-
-      // Check if there are any beneficiaries in the response
+  
       if (!response.data.beneficiary || response.data.beneficiary.length === 0)
         throw new Error("No beneficiaries found in response");
-
-      // Extract the properties from the first beneficiary in the response
+  
       const beneficiary = response.data.beneficiary[0];
       const lab = beneficiary.u_nm || "Unknown_Lab";
       const pcLab = beneficiary.f_nm || "Unknown_PCLab";
       const school = beneficiary.name || "Unknown_School";
-      const eiin = beneficiary.beneficiaryId || "Unknown_EIIN";
-
+      const ein = beneficiary.beneficiaryId || "Unknown_EIIN";
+  
+      // Process monthData to split date and time
+      const processedMonthData = monthData.map((item) => {
+        const start = new Date(item.earliestStart);
+        const end = new Date(item.latestEnd);
+  
+        // Destructure the item to exclude earliestStart and latestEnd
+        const { earliestStart, latestEnd, total_time, _id, beneficiaryId, name, u_nm, f_nm, m_nm, ...restOfItem } = item;
+  
+        return {
+          startDate: start.toLocaleDateString("en-GB"),
+          startTime: start.toLocaleTimeString("en-GB", { hour12: true }),
+          endDate: end.toLocaleDateString("en-GB"),
+          endTime: end.toLocaleTimeString("en-GB", { hour12: true }),
+          total_time,
+          ein,
+          pc_id: pcLab,
+          lab_id: lab,
+          school
+        };
+      });
+  
       // Convert the data to CSV
-      const csv = Papa.unparse(monthData);
-
-      // Create a CSV Blob
+      const csv = Papa.unparse(processedMonthData);
+  
       const blob = new Blob([csv], { type: "text/csv" });
-
-      // Create a link and click it to start the download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `pc_${school}_ein_${eiin}__pc_id_${pcLab}_Month_${month}.csv`;
+      link.download = `pc_${school}_ein_${ein}__pc_id_${pcLab}_Month_${month}.csv`;
       link.click();
     } catch (error) {
       console.error("Error fetching names:", error);
     }
   };
+  
+  
+  
 
   downloadData = () => {
     const parser = new Parser();
