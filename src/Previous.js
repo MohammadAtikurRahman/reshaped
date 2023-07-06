@@ -238,21 +238,20 @@ class Previous extends Component {
                     <TableHead>
                       <TableRow>
                         <TableCell align="center">
-
-                        <b>  Start Date & Time </b>
-                          
-                          </TableCell>
-                        <TableCell align="center">
-
-                        <b>  Last Usage Date & Time </b> 
-
+                          <b>Start Date</b>
                         </TableCell>
                         <TableCell align="center">
-                          <b> 
-                          Duration
-                          </b>
-                          
-                          </TableCell>
+                          <b>Start Time</b>
+                        </TableCell>
+                        <TableCell align="center">
+                          <b>Last Usage Date</b>
+                        </TableCell>
+                        <TableCell align="center">
+                          <b>Last Usage Time</b>
+                        </TableCell>
+                        <TableCell align="center">
+                          <b>Duration</b>
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -263,28 +262,39 @@ class Previous extends Component {
                           (item) =>
                             new Date(item.earliestStart).toLocaleString(
                               "default",
-                              {
-                                month: "long",
-                              }
+                              { month: "long" }
                             ) === month && (
                               <TableRow key={item._id}>
                                 <TableCell align="center">
                                   <b>
                                     {new Date(
                                       item.earliestStart
-                                    ).toLocaleString("en-GB", {
+                                    ).toLocaleDateString("en-GB")}
+                                  </b>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <b>
+                                    {new Date(
+                                      item.earliestStart
+                                    ).toLocaleTimeString("en-GB", {
                                       hour12: true,
                                     })}
                                   </b>
                                 </TableCell>
                                 <TableCell align="center">
                                   <b>
-                                    {new Date(item.latestEnd).toLocaleString(
-                                      "en-GB",
-                                      {
-                                        hour12: true,
-                                      }
-                                    )}
+                                    {new Date(
+                                      item.latestEnd
+                                    ).toLocaleDateString("en-GB")}
+                                  </b>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <b>
+                                    {new Date(
+                                      item.latestEnd
+                                    ).toLocaleTimeString("en-GB", {
+                                      hour12: true,
+                                    })}
                                   </b>
                                 </TableCell>
                                 <TableCell align="center">

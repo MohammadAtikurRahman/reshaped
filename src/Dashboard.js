@@ -698,10 +698,16 @@ export default class Dashboard extends Component {
               <TableHead>
                 <TableRow>
                   <TableCell align="center">
-                    <b> Start Date & Time </b>
+                    <b> Start Date </b>
                   </TableCell>
                   <TableCell align="center">
-                    <b> Last Usage Date & Time </b>
+                    <b> Start Time </b>
+                  </TableCell>
+                  <TableCell align="center">
+                    <b> Last Usage Date </b>
+                  </TableCell>
+                  <TableCell align="center">
+                    <b> Last Usage Time </b>
                   </TableCell>
                   <TableCell align="center">
                     <b> Duration </b>
@@ -710,50 +716,40 @@ export default class Dashboard extends Component {
               </TableHead>
 
               <TableBody>
-                {this.state?.filteredBeneficiary
-                  ?.reverse()
-                  .map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell align="center">
+  {this.state?.filteredBeneficiary
+    ?.reverse()
+    .map((row, index) => (
+      <TableRow key={index}>
+        <TableCell align="center">
+          <b> 
+          {new Date(lastData.earliestStart).toLocaleDateString("en-GB")}
+          </b>
+        </TableCell>
+        <TableCell align="center">
+          <b> 
+          {new Date(lastData.earliestStart).toLocaleTimeString("en-GB", { hour12: true })}
+          </b>
+        </TableCell>
+        <TableCell align="center">
+          <b>
+          {new Date(lastData.latestEnd).toLocaleDateString("en-GB")}
+          </b>
+        </TableCell>
+        <TableCell align="center">
+          <b>
+          {new Date(lastData.latestEnd).toLocaleTimeString("en-GB", { hour12: true })}
+          </b>
+        </TableCell>
+        <TableCell align="center" component="th" scope="row">
+          <b>
+          {this.convertToHoursAndMinutes(ttime.total_time)}
+          </b>
+        </TableCell>
+      </TableRow>
+    ))}
+</TableBody>
 
 
-                        <b> {new Date(lastData.earliestStart).toLocaleString(
-                          "en-GB",
-                          { hour12: true }
-                        )} </b>
-                       
-                      </TableCell>
-
-                      <TableCell align="center">
-
-                         <b>
-
-                        {new Date(lastData.latestEnd).toLocaleString("en-GB", {
-                          hour12: true,
-                        })}
-                        
-                        </b>
-
-
-                      </TableCell>
-
-                     
-
-                      <TableCell align="center" component="th" scope="row">
-
-
-                        <b>
-
-                        {this.convertToHoursAndMinutes(ttime.total_time)}
-
-                        
-</b>
-
-
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
             </Table>
 
             {/* <Previous /> */}
