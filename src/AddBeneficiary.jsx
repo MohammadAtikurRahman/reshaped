@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import swal from "sweetalert";
 import Swal from "sweetalert2";
+import { useEffect } from 'react';
 
 const axios = require("axios");
 const baseUrl = process.env.REACT_APP_URL;
@@ -18,44 +19,63 @@ export function AddBeneficiary(props) {
   const [beneficiary, setBeneficiary] = useState({});
   const [error, setError] = useState(false);
 
+  const [submit, setSubmit] = useState(false);
 
-  async function addBeneficiary(e) {
-    // ... (rest of the code remains the same)
-
-    try {
-        const res = await axios.post(baseUrl + "/beneficiary/", {
-            beneficiary: beneficiary,
-            token: localStorage.getItem("token"),
-        });
-
-        if (res.status === 200) {
-            handleEditModalClose();
-            Swal.fire({
-                text: "School Successfully Added",
-                icon: "success",
-                type: "success",
-                timer: 3000,
-                showConfirmButton: false,
-
-            });
-            getBeneficiaries();
-        }
-    } catch (error) {
-        if (error.response && error.response.data.errorMessage) {
-            swal({
-                text: error.response.data.errorMessage,
-                icon: "error",
-                type: "error",
-            });
-        } else {
-            swal({
-                text: "An error occurred. Please try again.",
-                icon: "error",
-                type: "error",
-            });
-        }
+  useEffect(() => {
+    if (submit && beneficiary.u_nm && beneficiary.beneficiaryId) {
+      makeRequest();
     }
-}
+  }, [submit, beneficiary]);
+  
+  async function makeRequest() {
+    try {
+      const res = await axios.post(baseUrl + "/beneficiary/", {
+        beneficiary: beneficiary,
+        token: localStorage.getItem("token"),
+      });
+  
+      if (res.status === 200) {
+        handleEditModalClose();
+        Swal.fire({
+          text: "School Successfully Added",
+          icon: "success",
+          type: "success",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        getBeneficiaries();
+      }
+    } catch (error) {
+      if (error.response && error.response.data.errorMessage) {
+        swal({
+          text: error.response.data.errorMessage,
+          icon: "error",
+          type: "error",
+        });
+      } else {
+        swal({
+          text: "An error occurred. Please try again.",
+          icon: "error",
+          type: "error",
+        });
+      }
+    }
+    setSubmit(false);
+  }
+  
+  async function addBeneficiary(e) {
+    e.preventDefault();
+  
+    // Appending the beneficiaryId (eiin) to u_nm (labId) and f_nm (PC ID)
+    setBeneficiary((prevState) => ({
+      ...prevState,
+      u_nm: `${prevState.beneficiaryId}${prevState.u_nm}`,
+      f_nm: `${prevState.beneficiaryId}${prevState.f_nm}`,
+    }));
+  
+    setSubmit(true);
+  }
+  
 
 
   function update(event) {
@@ -91,17 +111,7 @@ export function AddBeneficiary(props) {
             <b> Add School </b>{" "}
           </span>
         </DialogTitle>
-        {/* <TextField
-          id="standard-basic"
-          type="text"
-          autoComplete="off"
-          name="m_nm"
-          value={beneficiary.m_nm}
-          onChange={update}
-          placeholder="User Name"
-          required
-          fullWidth
-        /> */}
+ 
         <br />
         <TextField
           id="standard-basic"
