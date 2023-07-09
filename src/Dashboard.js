@@ -684,7 +684,7 @@ export default class Dashboard extends Component {
                   >
                     Edit
                   </Button>
-                  <BeneficiaryDelete row={row} />
+                  {/* <BeneficiaryDelete row={row} /> */}
                   &nbsp; &nbsp;
                 </div>
               </div>
