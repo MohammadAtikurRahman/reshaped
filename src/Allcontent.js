@@ -388,6 +388,8 @@ export default class Allcontent extends Component {
       });
   };
 
+
+
   onChange = (e) => {
     this.setState({ [e.target.name]: e.target.value }, () => {});
 

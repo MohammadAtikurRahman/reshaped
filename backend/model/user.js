@@ -30,8 +30,8 @@ const beneficiarySchema = new Schema(
           beneficiaryId: Number,
           mob: String,
           name: String,
-          u_nm: Number,
-          f_nm: Number,
+          u_nm: String,
+          f_nm: String,
           m_nm: String
     
 

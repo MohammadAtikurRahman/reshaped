@@ -66,11 +66,11 @@ export function AddBeneficiary(props) {
   async function addBeneficiary(e) {
     e.preventDefault();
   
-    // Appending the beneficiaryId (eiin) to u_nm (labId) and f_nm (PC ID)
+    // Appending 'L' to u_nm and 'P' to f_nm before appending the beneficiaryId (eiin)
     setBeneficiary((prevState) => ({
       ...prevState,
-      u_nm: `${prevState.beneficiaryId}${prevState.u_nm}`,
-      f_nm: `${prevState.beneficiaryId}${prevState.f_nm}`,
+      u_nm: `${prevState.u_nm}-L-${prevState.beneficiaryId}`,
+      f_nm: `${prevState.f_nm}-P-${prevState.beneficiaryId}`,
     }));
   
     setSubmit(true);

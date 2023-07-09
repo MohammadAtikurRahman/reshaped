@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Papa from "papaparse";
+import moment from "moment";
 import {
   Button,
   Table,
@@ -49,7 +50,7 @@ const File = () => {
         console.error("Error fetching CSV data:", error);
       });
   };
-  
+
   const deleteCSVFile = () => {
     fetch("http://localhost:2000/delete-csv", {
       method: "DELETE",
@@ -63,7 +64,6 @@ const File = () => {
       .then(console.log)
       .catch(console.error);
   };
-  
 
   const fetchData = () => {
     axios
@@ -90,8 +90,6 @@ const File = () => {
     fetchCSVData();
     setTimeout(deleteCSVFile, 3000); // Delete CSV file after 3 seconds
 
-
-
     axios
       .post("http://localhost:2000/videoinfo", {
         userId: user ? user.userid : null,
@@ -104,7 +102,7 @@ const File = () => {
         console.error("Error inserting data:", error);
       });
   };
-  
+
   const selectMonth = (month) => {
     if (selectedMonth === month) {
       setSelectedMonth("");
@@ -175,159 +173,175 @@ const File = () => {
       <br />
       <br />
 
-      {uniqueMonths.slice().reverse().map((month, index) => (
-        <Box margin={2} key={index}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            style={{ width: "150px" }}
-            onClick={() => selectMonth(month)}
-          >
-            {new Date(
-              month.split("-")[0],
-              month.split("-")[1] - 1
-            ).toLocaleString("default", { month: "long" })}
-            's Video Data
-          </Button>
-
-          <div style={{ display: "inline", padding: "20px" }}>
+      {uniqueMonths
+        .slice()
+        .reverse()
+        .map((month, index) => (
+          <Box margin={2} key={index}>
             <Button
               variant="contained"
               color="primary"
               size="small"
-              style={{ width: "220px" }}
-              onClick={() => downloadData(month)}
+              style={{ width: "150px" }}
+              onClick={() => selectMonth(month)}
             >
-              Download{" "}
               {new Date(
                 month.split("-")[0],
                 month.split("-")[1] - 1
-              ).toLocaleString("default", { month: "long" })}{" "}
-              Data
+              ).toLocaleString("default", { month: "long" })}
+              's Video Data
             </Button>
-          </div>
-          <br />
 
-          {selectedMonth === month && (
-            <TableContainer component={Paper}>
-              <br />
+            <div style={{ display: "inline", padding: "20px" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                style={{ width: "220px" }}
+                onClick={() => downloadData(month)}
+              >
+                Download{" "}
+                {new Date(
+                  month.split("-")[0],
+                  month.split("-")[1] - 1
+                ).toLocaleString("default", { month: "long" })}{" "}
+                Data
+              </Button>
+            </div>
+            <br />
 
-              <Table style={{ width: "98%" }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                    <b>       Video Name </b>
-                    </TableCell>
-                    <TableCell
+            {selectedMonth === month && (
+              <TableContainer component={Paper}>
+                <br />
+
+                <Table style={{ width: "98%" }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b> Video Name </b>
+                      </TableCell>
+                      {/* <TableCell
                       style={{ border: "1px solid black", fontSize: "10px" }}
                     >
                    <b>      File Location  </b>
-                    </TableCell>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                     <b>Player Starting    </b>    
-                    </TableCell>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                         <b>  Start Video Time  </b>  
-                    </TableCell>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                       <b>  Player Ending  </b> 
-                    </TableCell>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                     <b>  End Video Time </b>  
-                    </TableCell>
-                    <TableCell
-                      style={{ border: "1px solid black", fontSize: "10px" }}
-                    >
-                    <b>  Duration </b>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data
-                    .filter((item) => {
-                      const date = new Date(item.start_date_time);
-                      return (
-                        `${date.getFullYear()}-${date.getMonth() + 1}` ===
-                        selectedMonth
-                      );
-                    })
-                    .map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.video_name} </b>
-                        </TableCell>
-                        <TableCell
+                    </TableCell> */}
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b>Player Starting </b>
+                      </TableCell>
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b> Start Video Time </b>
+                      </TableCell>
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b> Player Ending </b>
+                      </TableCell>
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b> End Video Time </b>
+                      </TableCell>
+                      <TableCell
+                        style={{ border: "1px solid black", fontSize: "10px" }}
+                      >
+                        <b> Duration </b>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data
+                      .filter((item) => {
+                        const date = new Date(item.start_date_time);
+                        return (
+                          `${date.getFullYear()}-${date.getMonth() + 1}` ===
+                          selectedMonth
+                        );
+                      })
+                      .map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.video_name} </b>
+                          </TableCell>
+                          {/* <TableCell
                           style={{
                             border: "1px solid black",
                             fontSize: "10px",
                           }}
                         >
                           <b> {item.location} </b>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.pl_start} </b>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.start_date_time} </b>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.pl_end} </b>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.end_date_time} </b>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.duration}</b>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Box>
-      ))}
+                        </TableCell> */}
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.pl_start} </b>
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b>
+                              {" "}
+                              {moment(item.start_date_time).format(
+                                "DD/MM/YYYY, h:mm A"
+                              )}{" "}
+                            </b>
+                          </TableCell>
+
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.pl_end} </b>
+                          </TableCell>
+
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b>
+                              {" "}
+                              {moment(item.end_date_time).format(
+                                "DD/MM/YYYY, h:mm A"
+                              )}{" "}
+                            </b>
+                          </TableCell>
+
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.duration} Seconds</b>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+        ))}
     </div>
   );
 };
