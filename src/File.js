@@ -147,7 +147,7 @@ const File = () => {
       // Create a link and click it to start the download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `Video info ${school}_${eiin}_${lab}_${pcLab}_month_${monthName}.csv`;
+      link.download = `Vid ${school}-${lab}-${pcLab}-month-${monthName}.csv`;
       link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
@@ -254,6 +254,9 @@ const File = () => {
                       </TableCell>
                     </TableRow>
                   </TableHead>
+
+
+
                   <TableBody>
                     {data
                       .filter((item) => {
@@ -273,21 +276,13 @@ const File = () => {
                           >
                             <b> {item.video_name} </b>
                           </TableCell>
-                          {/* <TableCell
-                          style={{
-                            border: "1px solid black",
-                            fontSize: "10px",
-                          }}
-                        >
-                          <b> {item.location} </b>
-                        </TableCell> */}
                           <TableCell
                             style={{
                               border: "1px solid black",
                               fontSize: "10px",
                             }}
                           >
-                            <b> {item.pl_start} </b>
+                            <b> {item.pl_start} Seconds </b>
                           </TableCell>
                           <TableCell
                             style={{
@@ -309,7 +304,7 @@ const File = () => {
                               fontSize: "10px",
                             }}
                           >
-                            <b> {item.pl_end} </b>
+                            <b> {item.pl_end} Seconds </b>
                           </TableCell>
 
                           <TableCell
@@ -332,11 +327,15 @@ const File = () => {
                               fontSize: "10px",
                             }}
                           >
-                            <b> {item.duration} Seconds</b>
+                            <b> {item.duration} Minutes</b>
                           </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
+
+
+
+
                 </Table>
               </TableContainer>
             )}

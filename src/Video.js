@@ -211,8 +211,10 @@ export default class Video extends Component {
         const schoolName = data.beneficiary[0].name;
         const eiin = data.beneficiary[0].beneficiaryId;
         const pc_id = data.beneficiary[0].f_nm;
+        const lab_id = data.beneficiary[0].u_nm;
 
-        const fileName = `video_${schoolName}_ein_${eiin}_Pc_Id_${pc_id}.csv`; 
+
+        const fileName = `vid_all-${schoolName}-${lab_id}-${pc_id}.csv`; 
 
         // Create a download link
         const encodedUri = encodeURI(csvContent);
@@ -659,7 +661,7 @@ export default class Video extends Component {
                   >
                     Edit
                   </Button>
-                  <BeneficiaryDelete row={row} />
+                  {/* <BeneficiaryDelete row={row} /> */}
                   &nbsp; &nbsp;
                 </div>
               </div>

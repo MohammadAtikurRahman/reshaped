@@ -178,7 +178,7 @@ class Previous extends Component {
       const blob = new Blob([csv], { type: "text/csv" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `pc_${school}_ein_${ein}__pc_id_${pcLab}_Month_${month}.csv`;
+      link.download = `pc_${school}-${lab}-${pcLab}-${month}.csv`;
       link.click();
     } catch (error) {
       console.error("Error fetching names:", error);

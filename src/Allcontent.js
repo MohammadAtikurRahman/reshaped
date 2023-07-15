@@ -371,8 +371,9 @@ export default class Allcontent extends Component {
         const schoolName = data.beneficiary[0].name;
         const eiin = data.beneficiary[0].beneficiaryId;
         const pc_id = data.beneficiary[0].f_nm;
+        const lab_id = data.beneficiary[0].u_nm;
 
-        const fileName = `all_pc_${schoolName}_ein_${eiin}_Pc_Id_${pc_id}.csv`;
+        const fileName = `all_pc_${schoolName}-${lab_id}-${pc_id}.csv`;
 
         // Create a download link
         const encodedUri = encodeURI(csvContent);
