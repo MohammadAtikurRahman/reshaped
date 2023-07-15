@@ -119,7 +119,7 @@ export function AddBeneficiary(props) {
 
       style={{ zIndex: 1300 }}
     >
-      <DialogContent style={{ padding: "80px" }}>
+      <DialogContent style={{  width: "400px" }}>
         <DialogTitle id="alert-dialog-title">
           <span style={{ color: "#138D75" }}>
             {" "}
@@ -149,6 +149,11 @@ export function AddBeneficiary(props) {
           inputValue={eiinInput}
           onInputChange={(event, newInputValue) => {
             setEiinInput(newInputValue);
+            if (newInputValue === "") {
+              setNameInput("");
+              setBeneficiary({});
+              return;
+            }
             const selectedSchool = schools.find(
               (school) => school.eiin === newInputValue
             );
@@ -180,7 +185,6 @@ export function AddBeneficiary(props) {
           )}
         />
 
-        <br/>
         <br />
 
         <Autocomplete
@@ -190,6 +194,11 @@ export function AddBeneficiary(props) {
           inputValue={nameInput}
           onInputChange={(event, newInputValue) => {
             setNameInput(newInputValue);
+            if (newInputValue === "") {
+              setEiinInput("");
+              setBeneficiary({});
+              return;
+            }
             const selectedSchool = schools.find(
               (school) =>
                 school.name.toLowerCase() === newInputValue.toLowerCase()
@@ -223,31 +232,33 @@ export function AddBeneficiary(props) {
             </Popper>
           )}
         />
+
         <br />
-        <br />
+
         <TextField
-          id="standard-basic"
+          id="outlined-basic"
           type="text"
           autoComplete="off"
           name="u_nm"
           value={beneficiary.u_nm}
           onChange={update}
           placeholder="Lab Id "
+          variant="outlined"
           fullWidth
         />
         <br />
         <br />
         <TextField
-          id="standard-basic"
+          id="outlined-basic"
           type="text"
           autoComplete="off"
           name="f_nm"
           value={beneficiary.f_nm}
           onChange={update}
           placeholder="PC ID"
+          variant="outlined"
           fullWidth
         />
-        <br />
         <br />
       </DialogContent>
       <DialogActions style={{ paddingRight: "80px", paddingBottom: "50px" }}>
