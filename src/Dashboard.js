@@ -570,7 +570,7 @@ export default class Dashboard extends Component {
                   {row.m_nm}{" "}
                 </Button>
                 &nbsp; &nbsp;
-                <h5 style={{ paddingTop: "10px" }}>SRDL PC Dashboard</h5>
+                <h5 style={{ paddingTop: "10px" }}>D-Lab PC Dashboard</h5>
               </div>
             ))}
             <div style={{ flexGrow: 1 }} />

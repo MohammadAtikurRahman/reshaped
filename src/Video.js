@@ -575,7 +575,7 @@ export default class Video extends Component {
                 Video INFO
               </Button>
               &nbsp; &nbsp;
-              <h5 style={{ paddingTop: "10px"}}>SRDL Video Dashboard</h5>
+              <h5 style={{ paddingTop: "10px"}}>D-lab Video Dashboard</h5>
 
             </div>
 
