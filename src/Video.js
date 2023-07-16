@@ -144,7 +144,7 @@ export default class Video extends Component {
       const playerEndTime = `"${(pcData.pl_end || "").replace(/"/g, '""')}"`;
       const pcEndTime = `"${(pcData.end_date_time || "").replace(/"/g, '""')}"`;
       const totalTime = `"${(pcData.duration || "").replace(/"/g, '""')}"`;
-
+  
       return [
         videoName,
         location,
@@ -160,13 +160,13 @@ export default class Video extends Component {
         labId,
       ];
     }
-
+  
     axios
       .get("http://localhost:2000/get-testscore")
       .then((response) => {
         const { data } = response;
-        let csvContent = "data:text/csv;charset=utf-8,";
-
+        let csvContent = "";
+  
         // Combine headers
         const headers = [
           "Video Name",
@@ -183,14 +183,14 @@ export default class Video extends Component {
           "Lab ID",
         ];
         csvContent += headers.join(",") + "\r\n";
-
+  
         // Map beneficiaries with pc data
         data.beneficiary.forEach((bData) => {
           // Find matching pc data for each beneficiary
           const matchingPcData = data.pc.filter(
             (pcData) => bData.id === pcData.beneficiaryId
           );
-
+  
           // If matching pc data is found, create a row for each
           if (matchingPcData.length) {
             matchingPcData.forEach((pcData) => {
@@ -203,23 +203,21 @@ export default class Video extends Component {
             csvContent += row.join(",") + "\r\n";
           }
         });
-
-        // Extract school name for file renaming
-        // const schoolName = data.beneficiary[0].name;
-        // const fileName = `video_${schoolName}.csv`;
-
+  
         const schoolName = data.beneficiary[0].name;
         const eiin = data.beneficiary[0].beneficiaryId;
         const pc_id = data.beneficiary[0].f_nm;
         const lab_id = data.beneficiary[0].u_nm;
-
-
-        const fileName = `vid_all-${schoolName}-${lab_id}-${pc_id}.csv`; 
-
+  
+        const fileName = `vid_all-${schoolName}-${lab_id}-${pc_id}.csv`;
+  
+        // Create Blob with csvContent and BOM
+        const blob = new Blob(["\uFEFF" + csvContent], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+  
         // Create a download link
-        const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
+        link.setAttribute("href", url);
         link.setAttribute("download", fileName);
         document.body.appendChild(link);
         link.click();
@@ -229,7 +227,7 @@ export default class Video extends Component {
         console.error("Error downloading CSV:", error);
       });
   };
-
+  
 
 
   handleClose() {
