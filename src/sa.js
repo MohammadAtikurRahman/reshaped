@@ -7,76 +7,58 @@ import {
   DialogContent,
 } from "@material-ui/core";
 import { useState } from "react";
-import swal from "sweetalert";
-import Swal from "sweetalert2";
-import { useEffect } from 'react';
+import swal from "sweetalert2";
+import moment from "moment";
+import { Autocomplete } from "@material-ui/lab";
 
 const axios = require("axios");
 const baseUrl = process.env.REACT_APP_URL;
 
-export function AddBeneficiary(props) {
+export function EditBeneficiary(props) {
   const { isEditModalOpen, handleEditModalClose, getBeneficiaries } = props;
-  const [beneficiary, setBeneficiary] = useState({});
-  const [error, setError] = useState(false);
+  const [beneficiary, setBeneficiary] = useState(props.beneficiary);
 
-  const [submit, setSubmit] = useState(false);
+  async function updateBeneficiary(e) {
+    console.log(beneficiary);
 
-  useEffect(() => {
-    if (submit && beneficiary.u_nm && beneficiary.beneficiaryId) {
-      makeRequest();
-    }
-  }, [submit, beneficiary]);
-  
-  async function makeRequest() {
-    try {
-      const res = await axios.post(baseUrl + "/beneficiary/", {
-        beneficiary: beneficiary,
-        token: localStorage.getItem("token"),
-      });
-  
-      if (res.status === 200) {
-        handleEditModalClose();
-        Swal.fire({
-          text: "School Successfully Added",
-          icon: "success",
-          type: "success",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-        getBeneficiaries();
-      }
-    } catch (error) {
-      if (error.response && error.response.data.errorMessage) {
-        swal({
-          text: error.response.data.errorMessage,
-          icon: "error",
-          type: "error",
-        });
-      } else {
-        swal({
-          text: "An error occurred. Please try again.",
-          icon: "error",
-          type: "error",
-        });
-      }
-    }
-    setSubmit(false);
-  }
-  
-  async function addBeneficiary(e) {
     e.preventDefault();
-  
-    // Appending 'L' to u_nm and 'P' to f_nm before appending the beneficiaryId (eiin)
-    setBeneficiary((prevState) => ({
-      ...prevState,
-      u_nm: `${prevState.beneficiaryId}-L${prevState.u_nm}`,
-      f_nm: `${prevState.beneficiaryId}-P${prevState.f_nm}`,
-    }));
-  
-    setSubmit(true);
-  }
-  
 
+    if (!beneficiary.beneficiaryId) {
+      swal("Oops!", "Beneficiary Id is required!", "error");
+      return;
+    }
+
+    if (isNaN(beneficiary.beneficiaryId)) {
+      swal("Oops!", "Please enter a number", "error");
+      return;
+    }
+    if (!beneficiary.name) {
+      swal("Oops!", "Beneficiary Name is required!", "error");
+      return;
+    }
+
+    const res = await axios.patch(baseUrl + "/beneficiary/" + beneficiary._id, {
+      beneficiary: beneficiary,
+    });
+
+    if (res.status === 200) {
+      handleEditModalClose();
+      swal.fire({
+        text: "School Successfully Updated",
+        icon: "success",
+        type: "success",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      getBeneficiaries();
+    } else {
+      swal({
+        text: res?.data?.errorMessage,
+        icon: "error",
+        type: "error",
+      });
+    }
+  }
 
   function update(event) {
     let { name, value } = event.target;
@@ -89,29 +71,23 @@ export function AddBeneficiary(props) {
       return { ...beneficiary, [name]: value };
     });
   }
-  function checkNumber(e) {
-    if (isNaN(e.target.value)) {
-      swal("Oops!", "Please enter a number", "error");
-    }
-  }
-
   return (
     <Dialog
       open={isEditModalOpen}
       onClose={handleEditModalClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      style={{ zIndex: "99999" }}
       maxWidth="xs"
-      style={{ zIndex: "9999"}}
     >
       <DialogContent style={{ padding: "40px" }}>
         <DialogTitle id="alert-dialog-title">
           <span style={{ color: "#138D75" }}>
             {" "}
-            <b> Add School </b>{" "}
+            <b> Edit School </b>{" "}
           </span>
         </DialogTitle>
- 
+  
         <br />
         <TextField
           id="standard-basic"
@@ -120,10 +96,8 @@ export function AddBeneficiary(props) {
           name="beneficiaryId"
           value={beneficiary.beneficiaryId}
           onChange={update}
-          onBlur={checkNumber}
           placeholder="School EIIN"
           required
-          pattern="[0-9]*"
           fullWidth
         />
         <br />
@@ -147,7 +121,7 @@ export function AddBeneficiary(props) {
           name="u_nm"
           value={beneficiary.u_nm}
           onChange={update}
-          placeholder="Lab Id "
+          placeholder="Lab Id"
           fullWidth
         />
         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -158,14 +132,15 @@ export function AddBeneficiary(props) {
           name="f_nm"
           value={beneficiary.f_nm}
           onChange={update}
-          placeholder="PC ID"
+          placeholder="PC Id"
           fullWidth
         />
         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-      
+       
+        &nbsp;
       </DialogContent>
 
-      <DialogActions style={{ paddingRight: "80px", paddingBottom: "50px" }}>
+      <DialogActions style={{ paddingRight: "80px", paddingBottom: "30px" }}>
         <Button
           onClick={handleEditModalClose}
           color="primary"
@@ -174,12 +149,12 @@ export function AddBeneficiary(props) {
           Cancel
         </Button>
         <Button
-          onClick={addBeneficiary}
+          onClick={updateBeneficiary}
           color="primary"
           autoFocus
           style={{ backgroundColor: "#138D75", color: "white" }}
         >
-          Add School
+          Updated School
         </Button>
       </DialogActions>
     </Dialog>

@@ -17,8 +17,8 @@ const baseUrl = process.env.REACT_APP_URL;
 
 export function EditBeneficiary(props) {
   const { isEditModalOpen, handleEditModalClose, getBeneficiaries } = props;
-  const [beneficiary, setBeneficiary] = useState({});
   const [error, setError] = useState(false);
+  const [beneficiary, setBeneficiary] = useState(props.beneficiary);
 
   const [eiinInput, setEiinInput] = useState("");
   const [nameInput, setNameInput] = useState("");
@@ -31,10 +31,6 @@ export function EditBeneficiary(props) {
     { eiin: "130875", name: "Shaheed Muktijoddha Girls High School" },
     { eiin: "107827", name: "Ruhul Amin Khan Uccho Biddaloy" },
     { eiin: "104414", name: "Fateyabad Mohakali Balika Uccho Biddaloy" },
-    { eiin: "106916", name: "Shyamganj Uccho Biddaloy" },
-    { eiin: "138307", name: "Biam Laboratory School" },
-    { eiin: "117769", name: "The Old Kushtia HighSchool" },
-    { eiin: "131212", name: "Chulash Adarsha Uccho Biddaloy" },
   ];
 
   useEffect(() => {
@@ -119,7 +115,7 @@ export function EditBeneficiary(props) {
 
       style={{ zIndex: 1300 }}
     >
-      <DialogContent style={{  width: "400px" }}>
+      <DialogContent style={{ width: "400px" }}>
         <DialogTitle id="alert-dialog-title">
           <span style={{ color: "#138D75" }}>
             {" "}
@@ -128,62 +124,54 @@ export function EditBeneficiary(props) {
         </DialogTitle>
         <br />
 
-        {/* <TextField
-          id="standard-basic"
-          type="text"
-          autoComplete="off"
-          name="beneficiaryId"
-          value={beneficiary.beneficiaryId}
-          onChange={update}
-          onBlur={checkNumber}
-          placeholder="School EIIN"
-          required
-          pattern="[0-9]*"
-          fullWidth
-        /> */}
-
         <Autocomplete
-          id="eiin-combo-box"
-          options={schools}
-          getOptionLabel={(option) => option.eiin}
-          inputValue={eiinInput}
-          onInputChange={(event, newInputValue) => {
-            setEiinInput(newInputValue);
-            if (newInputValue === "") {
-              setNameInput("");
-              setBeneficiary({});
-              return;
-            }
-            const selectedSchool = schools.find(
-              (school) => school.eiin === newInputValue
-            );
-            if (selectedSchool) {
-              setBeneficiary((prevState) => ({
-                ...prevState,
-                beneficiaryId: selectedSchool.eiin,
-                name: selectedSchool.name,
-              }));
-              setNameInput(selectedSchool.name);
-            }
-          }}
-          filterOptions={(options, params) => {
-            if (params.inputValue === "") {
-              return [];
-            }
-            const filtered = options.filter((option) =>
-              option.eiin.includes(params.inputValue)
-            );
-            return filtered;
-          }}
-          renderInput={(params) => (
-            <TextField {...params} label="School EIIN" variant="outlined" />
-          )}
-          PopperComponent={({ children, ...props }) => (
-            <Popper {...props} style={{ zIndex: 2000 }}>
-              {children}
-            </Popper>
-          )}
-        />
+  id="eiin-combo-box"
+  options={schools}
+  getOptionLabel={(option) => String(option.eiin)}
+  value={
+    schools.find(
+      (school) => String(school.eiin) === String(beneficiary.beneficiaryId)
+    ) || null
+  }
+  
+  onInputChange={(event, newInputValue, reason) => {
+    if (reason === "input") {
+      setEiinInput(newInputValue);
+    }
+  }}
+  onChange={(event, newValue) => {
+    if (newValue) {
+      setBeneficiary({
+        beneficiaryId: String(newValue.eiin),
+        name: newValue.name,
+      });
+      setEiinInput(String(newValue.eiin));
+      setNameInput(newValue.name);
+    } else {
+      setBeneficiary({});
+      setEiinInput("");
+      setNameInput("");
+    }
+  }}
+  filterOptions={(options, params) => {
+    if (params.inputValue === "") {
+      return [];
+    }
+    const filtered = options.filter((option) =>
+      String(option.eiin).includes(params.inputValue)
+    );
+    return filtered;
+  }}
+  renderInput={(params) => (
+    <TextField {...params} label="School EIIN" variant="outlined" />
+  )}
+  PopperComponent={({ children, ...props }) => (
+    <Popper {...props} style={{ zIndex: 2000 }}>
+      {children}
+    </Popper>
+  )}
+/>
+
 
         <br />
 
@@ -191,25 +179,21 @@ export function EditBeneficiary(props) {
           id="name-combo-box"
           options={schools}
           getOptionLabel={(option) => option.name}
+          value={
+            schools.find((school) => school.name === beneficiary.name) || null
+          }
           inputValue={nameInput}
           onInputChange={(event, newInputValue) => {
             setNameInput(newInputValue);
-            if (newInputValue === "") {
-              setEiinInput("");
+          }}
+          onChange={(event, newValue) => {
+            if (newValue) {
+              setBeneficiary({
+                beneficiaryId: newValue.eiin,
+                name: newValue.name,
+              });
+            } else {
               setBeneficiary({});
-              return;
-            }
-            const selectedSchool = schools.find(
-              (school) =>
-                school.name.toLowerCase() === newInputValue.toLowerCase()
-            );
-            if (selectedSchool) {
-              setBeneficiary((prevState) => ({
-                ...prevState,
-                beneficiaryId: selectedSchool.eiin,
-                name: selectedSchool.name,
-              }));
-              setEiinInput(selectedSchool.eiin);
             }
           }}
           filterOptions={(options, params) => {
@@ -275,7 +259,7 @@ export function EditBeneficiary(props) {
           autoFocus
           style={{ backgroundColor: "#138D75", color: "white" }}
         >
-          Updated School
+          Add School
         </Button>
       </DialogActions>
     </Dialog>
