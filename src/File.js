@@ -117,6 +117,9 @@ const File = () => {
       return `${date.getFullYear()}-${date.getMonth() + 1}` === month;
     });
   
+    // Sort the filtered data by start_date_time in descending order
+    filteredData.sort((a, b) => new Date(b.start_date_time) - new Date(a.start_date_time));
+  
     try {
       // Fetch the names from the API
       const response = await axios.get("http://localhost:2000/get-school");
@@ -142,7 +145,9 @@ const File = () => {
       const csvContent = Papa.unparse(filteredData);
   
       // Create a CSV Blob with BOM
-      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
   
       // Create a link and click it to start the download
       const link = document.createElement("a");
@@ -156,7 +161,6 @@ const File = () => {
       console.error("Error fetching names:", error);
     }
   };
-  
   
 
   return (
@@ -224,7 +228,7 @@ const File = () => {
                       >
                         <b> Video Name </b>
                       </TableCell>
-                   
+
                       <TableCell
                         style={{ border: "1px solid black", fontSize: "10px" }}
                       >
@@ -253,84 +257,86 @@ const File = () => {
                     </TableRow>
                   </TableHead>
 
-
-
                   <TableBody>
-  {data
-    .filter((item) => {
-      const date = new Date(item.start_date_time);
-      return (
-        `${date.getFullYear()}-${date.getMonth() + 1}` === selectedMonth
-      );
-    })
-    .sort((a, b) => new Date(b.start_date_time) - new Date(a.start_date_time))
-    .map((item, index) => (
-      <TableRow key={index}>
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b> {item.video_name} </b>
-        </TableCell>
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b> {item.pl_start} Seconds </b>
-        </TableCell>
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b>
-            {" "}
-            {moment(item.start_date_time).format("DD/MM/YYYY, h:mm A")}{" "}
-          </b>
-        </TableCell>
+                    {data
+                      .filter((item) => {
+                        const date = new Date(item.start_date_time);
+                        return (
+                          `${date.getFullYear()}-${date.getMonth() + 1}` ===
+                          selectedMonth
+                        );
+                      })
+                      .sort(
+                        (a, b) =>
+                          new Date(b.start_date_time) -
+                          new Date(a.start_date_time)
+                      )
+                      .map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.video_name} </b>
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.pl_start} Seconds </b>
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b>
+                              {" "}
+                              {moment(item.start_date_time).format(
+                                "DD/MM/YYYY, h:mm A"
+                              )}{" "}
+                            </b>
+                          </TableCell>
 
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b> {item.pl_end} Seconds </b>
-        </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.pl_end} Seconds </b>
+                          </TableCell>
 
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b>
-            {" "}
-            {moment(item.end_date_time).format("DD/MM/YYYY, h:mm A")}{" "}
-          </b>
-        </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b>
+                              {" "}
+                              {moment(item.end_date_time).format(
+                                "DD/MM/YYYY, h:mm A"
+                              )}{" "}
+                            </b>
+                          </TableCell>
 
-        <TableCell
-          style={{
-            border: "1px solid black",
-            fontSize: "10px",
-          }}
-        >
-          <b> {item.duration} Minutes</b>
-        </TableCell>
-      </TableRow>
-    ))}
-</TableBody>
-
-
-
-
-
+                          <TableCell
+                            style={{
+                              border: "1px solid black",
+                              fontSize: "10px",
+                            }}
+                          >
+                            <b> {item.duration} Minutes</b>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
                 </Table>
               </TableContainer>
             )}

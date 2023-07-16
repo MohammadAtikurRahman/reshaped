@@ -123,7 +123,7 @@ export default class Video extends Component {
       });
   };
 
-  downloadCSV = () => {
+   downloadCSV = () => {
     function createCombinedRow(bData, pcData = {}) {
       // Combine beneficiary and pc data into a single row
       const userName = `"${(bData.m_nm || "").replace(/"/g, '""')}"`;
@@ -133,14 +133,8 @@ export default class Video extends Component {
       const labId = bData.f_nm;
       const videoName = `"${(pcData.video_name || "").replace(/"/g, '""')}"`;
       const location = `"${(pcData.location || "").replace(/"/g, '""')}"`;
-      const playerTimeStart = `"${(pcData.pl_start || "").replace(
-        /"/g,
-        '""'
-      )}"`;
-      const pcTimeStart = `"${(pcData.start_date_time || "").replace(
-        /"/g,
-        '""'
-      )}"`;
+      const playerTimeStart = `"${(pcData.pl_start || "").replace(/"/g, '""')}"`;
+      const pcTimeStart = `"${(pcData.start_date_time || "").replace(/"/g, '""')}"`;
       const playerEndTime = `"${(pcData.pl_end || "").replace(/"/g, '""')}"`;
       const pcEndTime = `"${(pcData.end_date_time || "").replace(/"/g, '""')}"`;
       const totalTime = `"${(pcData.duration || "").replace(/"/g, '""')}"`;
@@ -167,6 +161,24 @@ export default class Video extends Component {
         const { data } = response;
         let csvContent = "";
   
+        // Map beneficiaries with pc data
+        const combinedData = data.beneficiary.flatMap((bData) => {
+          // Find matching pc data for each beneficiary
+          const matchingPcData = data.pc.filter(
+            (pcData) => bData.id === pcData.beneficiaryId
+          );
+  
+          // If matching pc data is found, create a row for each
+          if (matchingPcData.length) {
+            return matchingPcData.map((pcData) =>
+              createCombinedRow(bData, pcData)
+            );
+          } else {
+            // If no matching pc data is found, create a row with just beneficiary data
+            return createCombinedRow(bData);
+          }
+        });
+  
         // Combine headers
         const headers = [
           "Video Name",
@@ -184,24 +196,14 @@ export default class Video extends Component {
         ];
         csvContent += headers.join(",") + "\r\n";
   
-        // Map beneficiaries with pc data
-        data.beneficiary.forEach((bData) => {
-          // Find matching pc data for each beneficiary
-          const matchingPcData = data.pc.filter(
-            (pcData) => bData.id === pcData.beneficiaryId
-          );
+        // Sort the combined data by start_date_time in descending order
+        combinedData.sort((a, b) =>
+          new Date(b[3]) - new Date(a[3])
+        );
   
-          // If matching pc data is found, create a row for each
-          if (matchingPcData.length) {
-            matchingPcData.forEach((pcData) => {
-              const row = createCombinedRow(bData, pcData);
-              csvContent += row.join(",") + "\r\n";
-            });
-          } else {
-            // If no matching pc data is found, create a row with just beneficiary data
-            const row = createCombinedRow(bData);
-            csvContent += row.join(",") + "\r\n";
-          }
+        // Add the rows to csvContent
+        combinedData.forEach((row) => {
+          csvContent += row.join(",") + "\r\n";
         });
   
         const schoolName = data.beneficiary[0].name;
@@ -212,7 +214,9 @@ export default class Video extends Component {
         const fileName = `vid_all-${schoolName}-${lab_id}-${pc_id}.csv`;
   
         // Create Blob with csvContent and BOM
-        const blob = new Blob(["\uFEFF" + csvContent], {type: 'text/csv;charset=utf-8;'});
+        const blob = new Blob(["\uFEFF" + csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
         const url = URL.createObjectURL(blob);
   
         // Create a download link
