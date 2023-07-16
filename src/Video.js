@@ -577,7 +577,7 @@ export default class Video extends Component {
                 Video INFO
               </Button>
               &nbsp; &nbsp;
-              <h5 style={{ paddingTop: "10px"}}>D-lab Video Dashboard</h5>
+              <h5 style={{ paddingTop: "10px"}}>D-Lab Video Dashboard</h5>
 
             </div>
 
@@ -596,7 +596,7 @@ export default class Video extends Component {
                   style={{ zIndex: "9999" }}
                   onClick={this.downloadCSV}
                 >
-                  Download
+                 All Video Download
                 </Button>
               </div>
             </div>

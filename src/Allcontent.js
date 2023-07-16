@@ -504,7 +504,7 @@ export default class Allcontent extends Component {
                   size="small"
                   onClick={this.downloadCSV}
                 >
-                  <b> Download </b>
+                  <b>All Pc Download </b>
                 </Button>
               </div>
             </div>
@@ -564,7 +564,7 @@ export default class Allcontent extends Component {
                   >
                     Edit
                   </Button>
-                  <BeneficiaryDelete row={row} />
+                  {/* <BeneficiaryDelete row={row} /> */}
                   &nbsp; &nbsp;
                 </div>
               </div>
