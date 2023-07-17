@@ -261,12 +261,14 @@ export default class Dashboard extends Component {
         window.location.reload();
         setTimeout(() => {
           window.location.reload();
-        }, 100); // Adjust the delay (in milliseconds) as needed
+        }, 10000); // Adjust the delay (in milliseconds) as needed
       });
     } catch (error) {
       console.error(error);
     }
   };
+
+
 
   getBeneficiaries = () => {
     this.setState({ loading: true });
