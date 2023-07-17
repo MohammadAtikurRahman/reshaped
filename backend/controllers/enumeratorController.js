@@ -27,24 +27,32 @@ async function getToken(data) {
 }
 
 async function userLogin(req, res) {
-    console.log(req.body);
-    let user = await User.findOne({username: req.body.username});
-    if (!req.body || !req.body.username || !req.body.password) {
-        return res.status(400).json({error: "Username or Password missing"});
+  console.log(req.body);
+  let user = await User.findOne({ username: req.body.username });
+  if (!req.body || !req.body.username || !req.body.password) {
+    return res.status(400).json({ error: "Username or Password missing" });
+  }
+  if (!user) {
+    return res.status(401).json({ error: "User Not Found" });
+  }
+  if (user.password === req.body.password) {
+    let token = await getToken(user);
+
+    // Check if PC data already exists
+    if (!user.pc || user.pc.length === 0) {
+      // Insert an empty PC data object
+      await User.updateOne({ _id: user._id }, { $push: { pc: {} } });
     }
-     if(!user){
-        return res.status(401).json({error: "User Not Found"});
-    }
-    if (user.password === req.body.password ) {
-        let token = await getToken(user);
-        return res.status(200).json({
-            message: "Login Successfully.",
-            token: token,
-            status: true,
-        });
-    }
-    return res.status(500).json({message: "Something went wrong."});
+
+    return res.status(200).json({
+      message: "Login Successfully.",
+      token: token,
+      status: true,
+    });
+  }
+  return res.status(500).json({ message: "Something went wrong." });
 }
+
 
 async function findUserid(req,res){
     console.log("userid",userid);

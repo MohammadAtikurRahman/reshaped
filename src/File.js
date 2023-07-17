@@ -30,6 +30,14 @@ const File = () => {
       .then((data) => setUser(data));
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      insertAndFetchData();
+    }, 3000); // Trigger every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchCSVData = () => {
     fetch("/video_information.csv")
       .then((response) => {
@@ -116,39 +124,39 @@ const File = () => {
       const date = new Date(item.start_date_time);
       return `${date.getFullYear()}-${date.getMonth() + 1}` === month;
     });
-  
+
     // Sort the filtered data by start_date_time in descending order
     filteredData.sort((a, b) => new Date(b.start_date_time) - new Date(a.start_date_time));
-  
+
     try {
       // Fetch the names from the API
       const response = await axios.get("http://localhost:2000/get-school");
-  
+
       // Check if there are any beneficiaries in the response
       if (!response.data.beneficiary || response.data.beneficiary.length === 0)
         throw new Error("No beneficiaries found in response");
-  
+
       // Extract the properties from the first beneficiary in the response
       const beneficiary = response.data.beneficiary[0];
       const lab = beneficiary.u_nm || "Unknown_Lab";
       const pcLab = beneficiary.f_nm || "Unknown_PCLab";
       const school = beneficiary.name || "Unknown_School";
       const eiin = beneficiary.beneficiaryId || "Unknown_EIIN";
-  
+
       // Convert the numerical month to a month name
       const date = new Date();
       const monthName = new Intl.DateTimeFormat("en-US", {
         month: "short",
       }).format(date.setMonth(month.split("-")[1] - 1));
-  
+
       // Create CSV from the data
       const csvContent = Papa.unparse(filteredData);
-  
+
       // Create a CSV Blob with BOM
       const blob = new Blob(["\uFEFF" + csvContent], {
         type: "text/csv;charset=utf-8;",
       });
-  
+
       // Create a link and click it to start the download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -161,7 +169,6 @@ const File = () => {
       console.error("Error fetching names:", error);
     }
   };
-  
 
   return (
     <div>
