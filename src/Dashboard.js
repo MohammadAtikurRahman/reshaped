@@ -12,7 +12,7 @@ import {
 import { Pagination } from "@material-ui/lab";
 import swal from "sweetalert";
 import Userid from "./Userid";
-
+import moment from "moment";
 import { Link as MaterialLink } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import BeneficiaryDelete, { beneficiarydelete } from "./BeneficiaryDelete";
@@ -180,39 +180,39 @@ export default class Dashboard extends Component {
       this.setState({ persons });
     });
 
-    const currentTime = new Date();
-    const currentDate = currentTime.toLocaleDateString();
-    const newTimeData = {
-      windowsStartTime: currentTime.toLocaleString(),
-    };
 
-    const storedData = localStorage.getItem("timeData");
+
+
+
+
+
+
+
+    const currentTime = moment();
+    const currentDate = currentTime.format('L');
+    const newTimeData = {
+      windowsStartTime: currentTime.format('L LTS'),
+    };
+    
+    let storedData = localStorage.getItem('timeData');
     if (storedData) {
-      const timeArray = JSON.parse(storedData);
+      let timeArray = JSON.parse(storedData);
       const lastTimeData = timeArray[timeArray.length - 1];
-      const lastStartTime = new Date(lastTimeData.windowsStartTime);
-      const duration = Math.floor(
-        (currentTime.getTime() - lastStartTime.getTime()) / (1000 * 60)
-      );
+      const lastStartTime = moment(lastTimeData.windowsStartTime, 'L LTS');
+      const duration = currentTime.diff(lastStartTime, 'minutes');
       newTimeData.duration = duration;
       timeArray.push(newTimeData);
-
-      localStorage.setItem("timeData", JSON.stringify(timeArray, null, 2));
-
-      const todaysData = timeArray.filter((item) => {
-        const itemDate = new Date(item.windowsStartTime).toLocaleDateString();
+      localStorage.setItem('timeData', JSON.stringify(timeArray, null, 2));
+    
+      let todaysData = timeArray.filter(item => {
+        const itemDate = moment(item.windowsStartTime, 'L LTS').format('L');
         return itemDate === currentDate;
       });
-
+    
       if (todaysData.length > 0) {
-        const firstStartTime = new Date(todaysData[0].windowsStartTime);
-        const lastStartTime = new Date(
-          todaysData[todaysData.length - 1].windowsStartTime
-        );
-        const totalDuration = Math.floor(
-          (lastStartTime.getTime() - firstStartTime.getTime()) / (1000 * 60)
-        );
-
+        const firstStartTime = moment(todaysData[0].windowsStartTime, 'L LTS');
+        const lastStartTime = moment(todaysData[todaysData.length - 1].windowsStartTime, 'L LTS');
+        const totalDuration = lastStartTime.diff(firstStartTime, 'minutes');
         this.setState({
           timeData: {
             totalDuration,
@@ -221,16 +221,26 @@ export default class Dashboard extends Component {
           },
         });
       } else {
-        console.log("No data for today yet");
+        console.log('No data for today yet');
       }
     } else {
       const timeArray = [newTimeData];
-      localStorage.setItem("timeData", JSON.stringify(timeArray, null, 2));
-      console.log("Time data saved to storage");
+      localStorage.setItem('timeData', JSON.stringify(timeArray, null, 2));
+      console.log('Time data saved to storage');
     }
-
+    
     // After setting timeData, send the data to the server
     this.sendPcData(this.state.timeData);
+
+
+
+
+
+
+
+
+
+
 
     fetch("http://localhost:2000/userid")
       .then((response) => response.json())
