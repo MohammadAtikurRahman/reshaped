@@ -22,6 +22,8 @@ export function EditBeneficiary(props) {
 
   const [eiinInput, setEiinInput] = useState("");
   const [nameInput, setNameInput] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
 
   const [submit, setSubmit] = useState(false);
 
@@ -503,11 +505,42 @@ export function EditBeneficiary(props) {
 
   ];
 
+
   useEffect(() => {
     if (submit && beneficiary.u_nm && beneficiary.beneficiaryId) {
       makeRequest();
     }
   }, [submit, beneficiary]);
+
+
+  useEffect(() => {
+    if (isEditModalOpen) {
+      setShowPasswordPrompt(true);
+    } else {
+      setAuthenticated(false);
+      setShowPasswordPrompt(false);
+    }
+  }, [isEditModalOpen]);
+
+
+  const handlePasswordPrompt = () => {
+    Swal.fire({
+      title: "Enter password",
+      input: "password",
+      showCancelButton: true,
+      preConfirm: (password) => {
+        if (password === "1234") {
+          setAuthenticated(true);
+        } else {
+          Swal.showValidationMessage("Invalid password!");
+        }
+      },
+    }).then((result) => {
+      if (result.isDismissed) {
+        handleEditModalClose();
+      }
+    });
+  };
 
   async function makeRequest() {
     try {
@@ -548,6 +581,11 @@ export function EditBeneficiary(props) {
   async function addBeneficiary(e) {
     e.preventDefault();
 
+    if (!authenticated) {
+      handlePasswordPrompt();
+      return;
+    }
+   try {
     // Appending 'L' to u_nm and 'P' to f_nm before appending the beneficiaryId (eiin)
     setBeneficiary((prevState) => ({
       ...prevState,
@@ -556,6 +594,11 @@ export function EditBeneficiary(props) {
     }));
 
     setSubmit(true);
+    } catch (error) {
+      console.log(error);
+      swal.fire("Update Failed", "An error occurred while updating the beneficiary. Please try again.", "error");
+    }
+
   }
 
   function update(event) {
@@ -575,6 +618,17 @@ export function EditBeneficiary(props) {
   }
 
   return (
+    <>
+     
+    {showPasswordPrompt && !authenticated && (
+      <div>
+        {handlePasswordPrompt()}
+      </div>
+    )}
+
+    {authenticated && (
+
+    
     <Dialog
       open={isEditModalOpen}
       onClose={handleEditModalClose}
@@ -594,19 +648,7 @@ export function EditBeneficiary(props) {
         </DialogTitle>
         <br />
 
-        {/* <TextField
-          id="standard-basic"
-          type="text"
-          autoComplete="off"
-          name="beneficiaryId"
-          value={beneficiary.beneficiaryId}
-          onChange={update}
-          onBlur={checkNumber}
-          placeholder="School EIIN"
-          required
-          pattern="[0-9]*"
-          fullWidth
-        /> */}
+      
 
         <Autocomplete
           id="eiin-combo-box"
@@ -745,5 +787,7 @@ export function EditBeneficiary(props) {
         </Button>
       </DialogActions>
     </Dialog>
+    )}
+    </>
   );
 }
